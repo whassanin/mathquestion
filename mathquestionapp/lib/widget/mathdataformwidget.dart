@@ -39,15 +39,15 @@ class _MathDataFormWidgetState extends State<MathDataFormWidget> {
   void saveData() {
     if (_formKey.currentState.validate()) {
       if (widget.isEdit) {
-        //mathDataModel.update();
+        mathDataModel.update();
       } else {
         mathDataModel.createMathData();
         mathDataModel.setExpression(expressionTEC.text);
         mathDataModel.setResponseTime(int.parse(responseTEC.text));
-        //mathDataModel.create();
+        mathDataModel.create();
       }
       //mathDataModel.start();
-      //Navigator.pop(context);
+      Navigator.pop(context);
     }
   }
 

@@ -18,6 +18,14 @@ class StackExpression {
   int get lengthValues => _queueValues.length;
   int get lengthChar => _queueChar.length;
 
+  void clearValues(){
+    _queueValues.clear();
+  }
+
+  void clearChar(){
+    _queueChar.clear();
+  }
+
   void pushChar(String val) {
     if (!_queueChar.contains(val)) {
       _queueChar.addLast(val);
@@ -254,12 +262,13 @@ class MathDataModel extends Model {
 
     if (isCalculated) {
       _mathData.error = _stackExpression.popValues();
-      setIsCalculated(isCalculated);
     } else {
       _mathData.error = 'Invalid Equation';
     }
 
-    print(isCalculated);
+    setIsCalculated(isCalculated);
+    _stackExpression.clearChar();
+    _stackExpression.clearValues();
 
     return isCalculated;
   }
@@ -281,7 +290,6 @@ class MathDataModel extends Model {
   }
 
   Future<bool> create() async {
-    print(_mathData.toJson().toString());
     String body = await _api.post(_mathData.toJson());
     Map<String, dynamic> list = jsonDecode(body);
     _mathData = MathData.fromJson(list);

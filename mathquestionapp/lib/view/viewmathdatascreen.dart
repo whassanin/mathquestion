@@ -12,7 +12,7 @@ class ViewMathDataScreen extends StatelessWidget {
   Widget build(BuildContext context) {
 
     //mathDataModel.start();
-    //mathDataModel.readAll();
+    mathDataModel.readAll();
 
     return ScopedModel<MathDataModel>(
       model: mathDataModel,
