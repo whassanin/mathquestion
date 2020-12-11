@@ -260,7 +260,6 @@ class MathDataModel extends Model {
     if (isCalculated) {
       _mathData.result = _stackExpression.popValues();
       setIsCalculated(isCalculated);
-      update();
     } else {
       _mathData.result = 'Invalid Equation';
     }
@@ -330,10 +329,10 @@ class MathDataModel extends Model {
   }
 
   static void _checkTask(SendPort sendPort) async {
-    currentList = mathDataModel.mathDataList;
-    print('handle' + currentList.length.toString());
-    currentList.forEach((element) {
+    print('handle' + mathDataModel.mathDataList.length.toString());
+    mathDataModel.mathDataList.forEach((element) {
       if (element.isCalculated == false) {
+        print(element.toJson().toString());
         sendPort.send(element.toJson());
       }
     });
@@ -344,6 +343,7 @@ class MathDataModel extends Model {
     MathData mathData = MathData.fromJson(data);
     editMathData(mathData);
     evaluateExpression();
+    update();
   }
 
   void stop() {

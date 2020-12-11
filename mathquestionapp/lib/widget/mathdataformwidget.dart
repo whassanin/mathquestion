@@ -22,8 +22,9 @@ class _MathDataFormWidgetState extends State<MathDataFormWidget> {
     if (mathDataColumns == MathDataColumns.expression) {
       mathDataModel.setExpression(val);
     } else if (mathDataColumns == MathDataColumns.response) {
-      print(val);
-      mathDataModel.setResponseTime(int.parse(val));
+      if (val.toString().isNotEmpty) {
+        mathDataModel.setResponseTime(int.parse(val));
+      }
     }
   }
 
@@ -43,6 +44,7 @@ class _MathDataFormWidgetState extends State<MathDataFormWidget> {
         mathDataModel.setResponseTime(int.parse(responseTEC.text));
         mathDataModel.create();
       }
+      mathDataModel.start();
       Navigator.pop(context);
     }
   }
@@ -100,6 +102,7 @@ class _MathDataFormWidgetState extends State<MathDataFormWidget> {
       onChanged: (v) {
         if (mathDataColumns == MathDataColumns.expression ||
             mathDataColumns == MathDataColumns.response) {
+          print(v);
           setData(mathDataColumns, v);
         }
       },
@@ -185,11 +188,10 @@ class _MathDataFormWidgetState extends State<MathDataFormWidget> {
 
   @override
   Widget build(BuildContext context) {
-
     Widget resultTFF = Container();
 
-    if(widget.isEdit){
-      if(mathDataModel.getResult().isNotEmpty){
+    if (widget.isEdit) {
+      if (mathDataModel.getResult().isNotEmpty) {
         resultTFF = textFormField(
           resultTEC,
           'Result',
