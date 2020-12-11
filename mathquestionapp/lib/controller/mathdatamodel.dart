@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'dart:collection';
+import 'dart:isolate';
 
+import 'package:mathquestionapp/main.dart';
 import 'package:mathquestionapp/model/mathdata.dart';
 import 'package:scoped_model/scoped_model.dart';
 
@@ -54,16 +57,50 @@ class StackExpression {
 }
 
 class MathDataModel extends Model {
+  bool _isLoading = false;
+
+  bool get isLoading => _isLoading;
+
   StackExpression _stackExpression = StackExpression();
 
-  MathData _mathData = new MathData('', '', 0);
+  MathData _mathData = new MathData(
+    0,
+    '',
+    '',
+    0,
+    false,
+    DateTime.now(),
+    DateTime.now(),
+  );
 
   MathData get mathData => _mathData;
 
   List<MathData> mathDataList = [];
 
+  static List<MathData> currentList = [];
+
+  int _currentId = 0;
+
+  Isolate _isolate;
+  ReceivePort _receivePort;
+  bool _running = false;
+
+  MathDataModel() {
+    generateData();
+    currentList = mathDataList;
+    _currentId = mathDataList.length;
+  }
+
   void createMathData() {
-    _mathData = new MathData('', '', 0);
+    _mathData = new MathData(
+      0,
+      '',
+      '',
+      0,
+      false,
+      DateTime.now(),
+      DateTime.now(),
+    );
   }
 
   void editMathData(MathData editMathData) {
@@ -89,11 +126,23 @@ class MathDataModel extends Model {
 
   void setResponseTime(int val) {
     _mathData.responseTime = val;
-    notifyListeners();
   }
 
   int getResponseTime() {
     return _mathData.responseTime;
+  }
+
+  void setIsCalculated(bool val) {
+    _mathData.isCalculated = val;
+    notifyListeners();
+  }
+
+  bool getIsCalculated() {
+    return _mathData.isCalculated;
+  }
+
+  void sortList() {
+    mathDataList.sort((a, b) => a.responseTime.compareTo(b.responseTime));
   }
 
   void getNumber(String num) {
@@ -128,8 +177,6 @@ class MathDataModel extends Model {
   }
 
   void evaluateExpression() {
-    DateTime startTime = DateTime.now();
-
     String expression = _mathData.expression;
     for (int i = 0; i <= expression.length - 1; i++) {
       if (expression[i] == ' ') {
@@ -212,68 +259,157 @@ class MathDataModel extends Model {
 
     if (isCalculated) {
       _mathData.result = _stackExpression.popValues();
+      setIsCalculated(isCalculated);
+      update();
     } else {
       _mathData.result = 'Invalid Equation';
     }
-
-    DateTime endTime = DateTime.now();
-
-    Duration diff = endTime.difference(startTime);
-
-    _mathData.responseTime = diff.inMicroseconds;
-
     notifyListeners();
   }
 
-  void createData() {
+  bool isExist() {
+    int index = mathDataList.indexWhere(
+      (element) => element.expression.trim() == _mathData.expression.trim(),
+    );
+
+    print(_mathData.expression.trim());
+
+    print('index exists:' + index.toString());
+    if (index < 0) {
+      return false;
+    }
+
+    return true;
+  }
+
+  void create() {
+    int index = mathDataList.indexWhere(
+      (element) => element.expression.trim() == _mathData.expression.trim(),
+    );
+
+    if (index < 0) {
+      _currentId = _currentId + 1;
+      _mathData.id = _currentId;
+      _mathData.executionDate = _mathData.createdDate.add(
+        Duration(
+          seconds: _mathData.responseTime,
+        ),
+      );
+
+      mathDataList.add(_mathData);
+      sortList();
+      notifyListeners();
+    }
+  }
+
+  void update() {
+    int index = mathDataList.indexWhere(
+      (element) => element.id == _mathData.id,
+    );
+    mathDataList[index] = _mathData;
+    sortList();
+    notifyListeners();
+  }
+
+  void delete() {
+    int index = mathDataList.indexWhere(
+      (element) => element.id == _mathData.id,
+    );
+    mathDataList.removeAt(index);
+    sortList();
+    notifyListeners();
+  }
+
+  void start() async {
+    _running = true;
+    _receivePort = ReceivePort();
+    _isolate = await Isolate.spawn(_checkTask, _receivePort.sendPort);
+    _receivePort.listen(_handleMessage, onDone: () {
+      print('Evaluated');
+    });
+  }
+
+  static void _checkTask(SendPort sendPort) async {
+    currentList = mathDataModel.mathDataList;
+    print('handle' + currentList.length.toString());
+    currentList.forEach((element) {
+      if (element.isCalculated == false) {
+        sendPort.send(element.toJson());
+      }
+    });
+  }
+
+  void _handleMessage(dynamic data) {
+    print('Received');
+    MathData mathData = MathData.fromJson(data);
+    editMathData(mathData);
+    evaluateExpression();
+  }
+
+  void stop() {
+    if (_isolate != null) {
+      _running = false;
+      _receivePort.close();
+      _isolate.kill(priority: Isolate.immediate);
+      _isolate = null;
+    }
+  }
+
+  void generateData() async {
+    _isLoading = true;
+    notifyListeners();
+
     List<MathData> list = [];
 
     createMathData();
     setExpression('2 * 18 + 3 - 4 / 6');
-    evaluateExpression();
-    list.add(_mathData);
+    setResponseTime(5);
+    create();
 
     createMathData();
     setExpression('3 * 18 + 3 - 4 / 7');
-    evaluateExpression();
-    list.add(_mathData);
+    setResponseTime(10);
+    create();
 
     createMathData();
     setExpression('4 * 18 + 3 - 4 / 8');
-    evaluateExpression();
-    list.add(_mathData);
+    setResponseTime(15);
+    create();
 
     createMathData();
     setExpression('6 * 18 + 3 - 4 / 9');
-    evaluateExpression();
-    list.add(_mathData);
+    setResponseTime(20);
+    create();
 
     createMathData();
     setExpression('2 * 18 + 3 - 4 / 10');
-    evaluateExpression();
-    list.add(_mathData);
+    setResponseTime(25);
+    create();
 
     createMathData();
     setExpression('8 * 18 + 3 - 4 / 11');
-    evaluateExpression();
-    list.add(_mathData);
+    setResponseTime(30);
+    create();
 
     createMathData();
     setExpression('2 * 18 + 3 - 4 / 12');
-    evaluateExpression();
-    list.add(_mathData);
+    setResponseTime(35);
+    create();
 
     createMathData();
     setExpression('10 * 18 + 3 - 4 / 51');
-    evaluateExpression();
-    list.add(_mathData);
+    setResponseTime(40);
+    create();
 
     createMathData();
     setExpression('2 * 18 + 3 - 4 / 60');
-    evaluateExpression();
-    list.add(_mathData);
+    setResponseTime(45);
+    create();
 
-    mathDataList = list;
+    sortList();
+
+    await Future.delayed(Duration(seconds: 2));
+    _isLoading = false;
     notifyListeners();
   }
 }

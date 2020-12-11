@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mathquestionapp/controller/mathdatamodel.dart';
-import 'package:mathquestionapp/view/mathdatascreen.dart';
+import 'package:mathquestionapp/view/viewmathdatascreen.dart';
 
 MathDataModel mathDataModel = new MathDataModel();
 
@@ -13,10 +13,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    mathDataModel.createData();
-
     return MaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -29,7 +28,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MathDataScreen(),
+      home: ViewMathDataScreen(),
     );
   }
 }
