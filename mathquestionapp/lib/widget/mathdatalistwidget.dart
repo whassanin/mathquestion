@@ -19,9 +19,9 @@ class _MathDataListWidgetState extends State<MathDataListWidget> {
     else {
       current = ListView.builder(
         shrinkWrap: true,
-        itemCount: MathDataModel.currentList.length,
+        itemCount: mathDataModel.mathDataList.length,
         itemBuilder: (BuildContext context, int index) {
-          return MathDataRowWidget(MathDataModel.currentList[index]);
+          return MathDataRowWidget(mathDataModel.mathDataList[index]);
         },
       );
     }

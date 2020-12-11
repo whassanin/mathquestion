@@ -10,7 +10,7 @@ MathData _$MathDataFromJson(Map<String, dynamic> json) {
   return MathData(
     json['id'] as int,
     json['expression'] as String,
-    json['result'] as String,
+    (json['result'] as num)?.toDouble(),
     json['responseTime'] as int,
     json['isCalculated'] as bool,
     json['createdDate'] == null

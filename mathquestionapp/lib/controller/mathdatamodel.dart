@@ -1,10 +1,15 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:isolate';
 
+import 'package:mathquestionapp/api/api.dart';
 import 'package:mathquestionapp/main.dart';
 import 'package:mathquestionapp/model/mathdata.dart';
 import 'package:scoped_model/scoped_model.dart';
+
+import '../model/mathdata.dart';
+import '../model/mathdata.dart';
 
 class StackExpression {
   Queue<String> _queueChar = Queue<String>();
@@ -57,16 +62,19 @@ class StackExpression {
 }
 
 class MathDataModel extends Model {
+
+  Api _api = new Api('mathdata');
+
+  StackExpression _stackExpression = StackExpression();
+
   bool _isLoading = false;
 
   bool get isLoading => _isLoading;
 
-  StackExpression _stackExpression = StackExpression();
-
   MathData _mathData = new MathData(
     0,
-    '',
-    '',
+    '0',
+    0,
     0,
     false,
     DateTime.now(),
@@ -77,25 +85,17 @@ class MathDataModel extends Model {
 
   List<MathData> mathDataList = [];
 
-  static List<MathData> currentList = [];
-
   int _currentId = 0;
 
   Isolate _isolate;
   ReceivePort _receivePort;
   bool _running = false;
 
-  MathDataModel() {
-    generateData();
-    currentList = mathDataList;
-    _currentId = mathDataList.length;
-  }
-
   void createMathData() {
     _mathData = new MathData(
       0,
       '',
-      '',
+      0,
       0,
       false,
       DateTime.now(),
@@ -115,12 +115,20 @@ class MathDataModel extends Model {
     return _mathData.expression;
   }
 
-  void setResult(String val) {
+  void setError(String val) {
+    _mathData.error = val;
+  }
+
+  String getError() {
+    return _mathData.error;
+  }
+
+  void setResult(double val) {
     _mathData.result = val;
     notifyListeners();
   }
 
-  String getResult() {
+  double getResult() {
     return _mathData.result;
   }
 
@@ -139,19 +147,6 @@ class MathDataModel extends Model {
 
   bool getIsCalculated() {
     return _mathData.isCalculated;
-  }
-
-  void sortList() {
-    mathDataList.sort((a, b) => a.responseTime.compareTo(b.responseTime));
-  }
-
-  void getNumber(String num) {
-    int isNumber = int.tryParse(num.toString());
-    if (isNumber != null) {
-      int val = 0;
-
-      for (int i = 0; i < num.length - 1; i++) {}
-    }
   }
 
   int precedence(String op) {
@@ -176,7 +171,7 @@ class MathDataModel extends Model {
     return z;
   }
 
-  void evaluateExpression() {
+  bool validate() {
     String expression = _mathData.expression;
     for (int i = 0; i <= expression.length - 1; i++) {
       if (expression[i] == ' ') {
@@ -258,65 +253,67 @@ class MathDataModel extends Model {
     }
 
     if (isCalculated) {
-      _mathData.result = _stackExpression.popValues();
+      _mathData.error = _stackExpression.popValues();
       setIsCalculated(isCalculated);
     } else {
-      _mathData.result = 'Invalid Equation';
+      _mathData.error = 'Invalid Equation';
     }
+
+    print(isCalculated);
+
+    return isCalculated;
+  }
+
+  Future<List<MathData>> readAll() async {
+    _isLoading = true;
     notifyListeners();
+
+    List<dynamic> listMap = await _api.get();
+
+    mathDataList = listMap.map((e) => MathData.fromJson(e)).toList();
+
+    await Future.delayed(Duration(seconds: 1));
+
+    _isLoading = false;
+    notifyListeners();
+
+    return mathDataList;
   }
 
-  bool isExist() {
-    int index = mathDataList.indexWhere(
-      (element) => element.expression.trim() == _mathData.expression.trim(),
-    );
-
-    print(_mathData.expression.trim());
-
-    print('index exists:' + index.toString());
-    if (index < 0) {
-      return false;
+  Future<bool> create() async {
+    print(_mathData.toJson().toString());
+    String body = await _api.post(_mathData.toJson());
+    Map<String, dynamic> list = jsonDecode(body);
+    _mathData = MathData.fromJson(list);
+    if (_mathData.id != null) {
+      if (_mathData.id > 0) {
+        mathDataList.add(_mathData);
+        await Future.delayed(Duration(seconds: 1));
+        return true;
+      }
     }
-
-    return true;
+    return false;
   }
 
-  void create() {
-    int index = mathDataList.indexWhere(
-      (element) => element.expression.trim() == _mathData.expression.trim(),
-    );
-
-    if (index < 0) {
-      _currentId = _currentId + 1;
-      _mathData.id = _currentId;
-      _mathData.executionDate = _mathData.createdDate.add(
-        Duration(
-          seconds: _mathData.responseTime,
-        ),
-      );
-
-      mathDataList.add(_mathData);
-      sortList();
+  Future<bool> update() async {
+    int code = await _api.put(
+        _mathData.toJson(), _mathData.id.toString());
+    if (code == 200) {
       notifyListeners();
+
+      return true;
     }
+    return false;
   }
 
-  void update() {
-    int index = mathDataList.indexWhere(
-      (element) => element.id == _mathData.id,
-    );
-    mathDataList[index] = _mathData;
-    sortList();
-    notifyListeners();
-  }
-
-  void delete() {
-    int index = mathDataList.indexWhere(
-      (element) => element.id == _mathData.id,
-    );
-    mathDataList.removeAt(index);
-    sortList();
-    notifyListeners();
+  Future<bool> delete() async {
+    int code = await _api.delete(_mathData.id.toString());
+    await Future.delayed(Duration(seconds: 4));
+    if (code == 204) {
+      notifyListeners();
+      return true;
+    }
+    return false;
   }
 
   void start() async {
@@ -342,8 +339,6 @@ class MathDataModel extends Model {
     print('Received');
     MathData mathData = MathData.fromJson(data);
     editMathData(mathData);
-    evaluateExpression();
-    update();
   }
 
   void stop() {
@@ -405,8 +400,6 @@ class MathDataModel extends Model {
     setExpression('2 * 18 + 3 - 4 / 60');
     setResponseTime(45);
     create();
-
-    sortList();
 
     await Future.delayed(Duration(seconds: 2));
     _isLoading = false;

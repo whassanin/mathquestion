@@ -17,7 +17,7 @@ class _MathDataRowWidgetState extends State<MathDataRowWidget> {
       style: TextStyle(backgroundColor: Colors.red, color: Colors.white),
     );
 
-    Widget resultWidget = Text(widget.mathData.result);
+    Widget resultWidget = Text(widget.mathData.result.toString());
 
     Widget resultText =
         (widget.mathData.isCalculated ? resultWidget : progressWidget);

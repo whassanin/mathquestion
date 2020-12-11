@@ -25,18 +25,48 @@ SECRET_KEY = 'th&!($#vllaiu5v@@7(c8+k8%8u20uabt5&!#ky6d^5m(q3stk'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*','0.0.0.0']
 
+CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ALLOWED_ORIGINS = [
+ 'http://localhost:8000'
+]
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 # Application definition
 
 INSTALLED_APPS = [
+    'mathquestion.apps.MathquestionConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'django_filters',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -75,8 +105,13 @@ WSGI_APPLICATION = 'mathquestionapi.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'mathquestiondb',
+        'USER':'root',
+        #'USER':'admin',
+        'PASSWORD':'admin',
+        'HOST':'localhost',
+        'PORT':'3306'
     }
 }
 

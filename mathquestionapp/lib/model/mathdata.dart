@@ -8,11 +8,14 @@ part 'mathdata.g.dart';
 class MathData{
   int id;
   String expression;
-  String result;
+  double result;
   int responseTime;
   bool isCalculated;
   DateTime createdDate;
   DateTime executionDate;
+
+  @JsonKey(ignore: true)
+  String error;
 
   MathData(this.id,this.expression,this.result,this.responseTime,this.isCalculated,this.createdDate,this.executionDate);
 
