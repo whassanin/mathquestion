@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mathquestionapp/controller/mathdatamodel.dart';
 import 'package:mathquestionapp/main.dart';
 import 'package:mathquestionapp/view/newmathdatascreen.dart';
+import 'package:mathquestionapp/widget/locationwidget.dart';
 import 'package:mathquestionapp/widget/mathdatalistwidget.dart';
 import 'package:scoped_model/scoped_model.dart';
 
@@ -40,7 +41,12 @@ class ViewMathDataScreen extends StatelessWidget {
 
           return Scaffold(
             appBar: appBar,
-            body: MathDataListWidget(),
+            body: Column(
+              children: [
+                LocationWidget(),
+                Expanded(child: MathDataListWidget()),
+              ],
+            ),
           );
         },
       ),

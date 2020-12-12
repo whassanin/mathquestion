@@ -1,10 +1,5 @@
-import 'dart:async';
-import 'dart:isolate';
-
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:mathquestionapp/controller/mathdatamodel.dart';
-import 'package:mathquestionapp/model/mathdata.dart';
 import 'package:mathquestionapp/view/viewmathdatascreen.dart';
 
 MathDataModel mathDataModel = new MathDataModel();
@@ -18,8 +13,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //mathDataModel.generateData();
-    //mathDataModel.start();
+    mathDataModel.determinePosition();
+    mathDataModel.start();
 
     return MaterialApp(
       title: 'Flutter Demo',

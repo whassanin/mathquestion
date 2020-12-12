@@ -5,7 +5,6 @@ import 'dart:isolate';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:mathquestionapp/api/api.dart';
-import 'package:mathquestionapp/main.dart';
 import 'package:mathquestionapp/model/mathdata.dart';
 import 'package:scoped_model/scoped_model.dart';
 
@@ -75,6 +74,9 @@ class MathDataModel extends Model {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  double latitude;
+  double longitude;
+
   Isolate _isolate;
   ReceivePort _receivePort;
   bool _running = false;
@@ -85,8 +87,6 @@ class MathDataModel extends Model {
     0,
     0,
     false,
-    0,
-    0,
     DateTime.now(),
     DateTime.now(),
   );
@@ -102,12 +102,9 @@ class MathDataModel extends Model {
       0,
       0,
       false,
-      0,
-      0,
       DateTime.now(),
       DateTime.now(),
     );
-    _determinePosition();
   }
 
   void editMathData(MathData editMathData) {
@@ -139,24 +136,6 @@ class MathDataModel extends Model {
     return _mathData.result;
   }
 
-  void setLatitude(double val) {
-    _mathData.latitude = val;
-    notifyListeners();
-  }
-
-  double getLatitude() {
-    return _mathData.latitude;
-  }
-
-  void setLongitude(double val) {
-    _mathData.longitude = val;
-    notifyListeners();
-  }
-
-  double getLongitude() {
-    return _mathData.longitude;
-  }
-
   void setResponseTime(int val) {
     _mathData.responseTime = val;
   }
@@ -180,6 +159,46 @@ class MathDataModel extends Model {
 
   DateTime getChangedDate(){
     return _mathData.changedDate;
+  }
+
+  double getLatitude() {
+    return latitude;
+  }
+
+  double getLongitude() {
+    return longitude;
+  }
+
+  Future<Position> determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permantly denied, we cannot request permissions.');
+    }
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission != LocationPermission.whileInUse &&
+          permission != LocationPermission.always) {
+        return Future.error(
+            'Location permissions are denied (actual value: $permission).');
+      }
+    }
+
+    Position position = await Geolocator.getCurrentPosition();
+    latitude = position.latitude;
+    longitude = position.longitude;
+    notifyListeners();
+
+    return position;
   }
 
   int precedence(String op) {
@@ -323,40 +342,6 @@ class MathDataModel extends Model {
     _stackExpression.clearValues();
 
     return isCalculated;
-  }
-
-  Future<Position> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error(
-          'Location permissions are permantly denied, we cannot request permissions.');
-    }
-
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission != LocationPermission.whileInUse &&
-          permission != LocationPermission.always) {
-        return Future.error(
-            'Location permissions are denied (actual value: $permission).');
-      }
-    }
-
-    Position position = await Geolocator.getCurrentPosition();
-
-    _mathData.latitude = position.latitude;
-    _mathData.longitude =position.longitude;
-
-    print(_mathData.toJson().toString());
-
-    return position;
   }
 
   Future<List<MathData>> readAll() async {
