@@ -11,9 +11,6 @@ class ViewMathDataScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    //mathDataModel.start();
-    mathDataModel.readAll();
-
     return ScopedModel<MathDataModel>(
       model: mathDataModel,
       child: ScopedModelDescendant(
@@ -29,7 +26,6 @@ class ViewMathDataScreen extends StatelessWidget {
               IconButton(
                 icon: Icon(Icons.add),
                 onPressed: () {
-                  mathDataModel.stop();
                   mathDataModel.createMathData();
                   Navigator.push(
                     context,

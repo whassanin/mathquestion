@@ -3,7 +3,6 @@ from rest_framework import serializers
 from mathquestion.models import *
 from django.db.models import *
 
-
 def precedence(op):
     if op == '+' or op == '-':
         return 1
@@ -70,6 +69,7 @@ def calculate(tokens):
             
     return values[-1]
 
+
 class MathDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = MathData
@@ -85,9 +85,9 @@ class MathDataSerializer(serializers.ModelSerializer):
 
     def create(self,validated_data):
         expression = validated_data.get('expression')
-        result = calculate(expression)
-        isCalculated = True
         responseTime = validated_data.get('responseTime')
+        result = calculate(expression)
+        isCalculated = False
         createdDate = validated_data.get('createdDate')
         executionDate = validated_data.get('executionDate')
         mathData = MathData(expression=expression,result=result,isCalculated=isCalculated,createdDate=createdDate,executionDate=executionDate)

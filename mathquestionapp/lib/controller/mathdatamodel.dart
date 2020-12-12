@@ -18,11 +18,11 @@ class StackExpression {
   int get lengthValues => _queueValues.length;
   int get lengthChar => _queueChar.length;
 
-  void clearValues(){
+  void clearValues() {
     _queueValues.clear();
   }
 
-  void clearChar(){
+  void clearChar() {
     _queueChar.clear();
   }
 
@@ -70,7 +70,6 @@ class StackExpression {
 }
 
 class MathDataModel extends Model {
-
   Api _api = new Api('mathdata');
 
   StackExpression _stackExpression = StackExpression();
@@ -93,11 +92,9 @@ class MathDataModel extends Model {
 
   List<MathData> mathDataList = [];
 
-  int _currentId = 0;
-
-  Isolate _isolate;
-  ReceivePort _receivePort;
-  bool _running = false;
+  static List<MathData> getList(){
+    return mathDataModel.mathDataList;
+  }
 
   void createMathData() {
     _mathData = new MathData(
@@ -281,8 +278,6 @@ class MathDataModel extends Model {
 
     mathDataList = listMap.map((e) => MathData.fromJson(e)).toList();
 
-    await Future.delayed(Duration(seconds: 1));
-
     _isLoading = false;
     notifyListeners();
 
@@ -304,8 +299,7 @@ class MathDataModel extends Model {
   }
 
   Future<bool> update() async {
-    int code = await _api.put(
-        _mathData.toJson(), _mathData.id.toString());
+    int code = await _api.put(_mathData.toJson(), _mathData.id.toString());
     if (code == 200) {
       notifyListeners();
 
@@ -324,40 +318,6 @@ class MathDataModel extends Model {
     return false;
   }
 
-  void start() async {
-    _running = true;
-    _receivePort = ReceivePort();
-    _isolate = await Isolate.spawn(_checkTask, _receivePort.sendPort);
-    _receivePort.listen(_handleMessage, onDone: () {
-      print('Evaluated');
-    });
-  }
-
-  static void _checkTask(SendPort sendPort) async {
-    print('handle' + mathDataModel.mathDataList.length.toString());
-    mathDataModel.mathDataList.forEach((element) {
-      if (element.isCalculated == false) {
-        print(element.toJson().toString());
-        sendPort.send(element.toJson());
-      }
-    });
-  }
-
-  void _handleMessage(dynamic data) {
-    print('Received');
-    MathData mathData = MathData.fromJson(data);
-    editMathData(mathData);
-  }
-
-  void stop() {
-    if (_isolate != null) {
-      _running = false;
-      _receivePort.close();
-      _isolate.kill(priority: Isolate.immediate);
-      _isolate = null;
-    }
-  }
-
   void generateData() async {
     _isLoading = true;
     notifyListeners();
@@ -366,47 +326,12 @@ class MathDataModel extends Model {
 
     createMathData();
     setExpression('2 * 18 + 3 - 4 / 6');
-    setResponseTime(5);
+    setResponseTime(120);
     create();
 
     createMathData();
     setExpression('3 * 18 + 3 - 4 / 7');
-    setResponseTime(10);
-    create();
-
-    createMathData();
-    setExpression('4 * 18 + 3 - 4 / 8');
-    setResponseTime(15);
-    create();
-
-    createMathData();
-    setExpression('6 * 18 + 3 - 4 / 9');
-    setResponseTime(20);
-    create();
-
-    createMathData();
-    setExpression('2 * 18 + 3 - 4 / 10');
-    setResponseTime(25);
-    create();
-
-    createMathData();
-    setExpression('8 * 18 + 3 - 4 / 11');
-    setResponseTime(30);
-    create();
-
-    createMathData();
-    setExpression('2 * 18 + 3 - 4 / 12');
-    setResponseTime(35);
-    create();
-
-    createMathData();
-    setExpression('10 * 18 + 3 - 4 / 51');
-    setResponseTime(40);
-    create();
-
-    createMathData();
-    setExpression('2 * 18 + 3 - 4 / 60');
-    setResponseTime(45);
+    setResponseTime(120);
     create();
 
     await Future.delayed(Duration(seconds: 2));

@@ -2,6 +2,7 @@
     package="com.mathquestion.mathquestionapp">
    <application
         android:label="mathquestionapp"
+        android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

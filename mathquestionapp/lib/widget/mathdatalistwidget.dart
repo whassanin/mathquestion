@@ -17,6 +17,7 @@ class _MathDataListWidgetState extends State<MathDataListWidget> {
       current = Center(child: Container(child: CircularProgressIndicator(),),);
     }
     else {
+      print('content:'+mathDataModel.mathDataList.length.toString());
       current = ListView.builder(
         shrinkWrap: true,
         itemCount: mathDataModel.mathDataList.length,
