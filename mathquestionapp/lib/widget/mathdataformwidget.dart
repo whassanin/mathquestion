@@ -4,7 +4,7 @@ import 'package:mathquestionapp/main.dart';
 
 import '../main.dart';
 
-enum MathDataColumns { expression, result, response }
+enum MathDataColumns { expression, result, response, latitude, longitude}
 
 class MathDataFormWidget extends StatefulWidget {
   final bool isEdit;
@@ -19,6 +19,9 @@ class _MathDataFormWidgetState extends State<MathDataFormWidget> {
   TextEditingController expressionTEC = new TextEditingController();
   TextEditingController resultTEC = new TextEditingController();
   TextEditingController responseTEC = new TextEditingController();
+  TextEditingController latitudeTEC = new TextEditingController();
+  TextEditingController longitudeTEC = new TextEditingController();
+
 
   void setData(MathDataColumns mathDataColumns, Object val) {
     if (mathDataColumns == MathDataColumns.expression) {
@@ -34,6 +37,8 @@ class _MathDataFormWidgetState extends State<MathDataFormWidget> {
     expressionTEC.text = mathDataModel.getExpression();
     resultTEC.text = mathDataModel.getResult().toString();
     responseTEC.text = mathDataModel.getResponseTime().toString();
+    latitudeTEC.text = mathDataModel.getLatitude().toString();
+    longitudeTEC.text = mathDataModel.getLongitude().toString();
   }
 
   void saveData() {
@@ -194,6 +199,8 @@ class _MathDataFormWidgetState extends State<MathDataFormWidget> {
   @override
   Widget build(BuildContext context) {
     Widget resultTFF = Container();
+    Widget latitudeTFF = Container();
+    Widget longitudeTFF = Container();
 
     if (widget.isEdit) {
       if (mathDataModel.getResult().toString().isNotEmpty) {
@@ -205,6 +212,27 @@ class _MathDataFormWidgetState extends State<MathDataFormWidget> {
           true,
         );
       }
+
+      if (mathDataModel.getLatitude().toString().isNotEmpty) {
+        latitudeTFF = textFormField(
+          latitudeTEC,
+          'Latitude',
+          MathDataColumns.latitude,
+          true,
+          true,
+        );
+      }
+
+      if (mathDataModel.getLongitude().toString().isNotEmpty) {
+        longitudeTFF = textFormField(
+          longitudeTEC,
+          'Longitude',
+          MathDataColumns.longitude,
+          true,
+          true,
+        );
+      }
+
     }
 
     Widget editButtons = Row(
@@ -245,6 +273,8 @@ class _MathDataFormWidgetState extends State<MathDataFormWidget> {
             true,
             false,
           ),
+          latitudeTFF,
+          longitudeTFF,
           editButtons,
         ],
       ),

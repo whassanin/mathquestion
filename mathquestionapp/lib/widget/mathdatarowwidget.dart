@@ -22,7 +22,7 @@ class _MathDataRowWidgetState extends State<MathDataRowWidget> {
     Widget resultText =
         (widget.mathData.isCalculated ? resultWidget : progressWidget);
 
-    Widget valueColumn = Container(
+    Widget equationValueColumn = Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,8 +44,22 @@ class _MathDataRowWidgetState extends State<MathDataRowWidget> {
       ),
     );
 
-    Widget titleColumn = Container(
-      width: 85,
+    Widget locationValueColumn = Container(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(widget.mathData.latitude.toString()),
+          SizedBox(
+            height: 10,
+          ),
+          Text(widget.mathData.longitude.toString()),
+        ],
+      ),
+    );
+
+    Widget equationColumn = Container(
+      width: 90,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,14 +81,61 @@ class _MathDataRowWidgetState extends State<MathDataRowWidget> {
       ),
     );
 
+    Widget locationColumn = Container(
+      width: 90,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('latitude: '),
+          SizedBox(
+            height: 10,
+          ),
+          Text('longitude: '),
+          SizedBox(
+            height: 10,
+          ),
+        ],
+      ),
+    );
+
     Widget mathDataRowContainer = Container(
       height: 100,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          titleColumn,
-          Expanded(child: valueColumn),
+          SizedBox(width: 30,),
+          equationColumn,
+          Expanded(child: equationValueColumn),
+        ],
+      ),
+    );
+
+    Widget mathDataLocationRowContainer = Container(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(width: 30,),
+          locationColumn,
+          Expanded(child: locationValueColumn),
+        ],
+      ),
+    );
+
+    Widget mathDataColumnContainer = Container(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('Equation:'),
+          SizedBox(height: 10,),
+          mathDataRowContainer,
+          SizedBox(height: 10,),
+          Text('Location:'),
+          SizedBox(height: 10,),
+          mathDataLocationRowContainer
         ],
       ),
     );
@@ -89,7 +150,7 @@ class _MathDataRowWidgetState extends State<MathDataRowWidget> {
       ),
       child: Padding(
         padding: const EdgeInsets.all(10.0),
-        child: mathDataRowContainer,
+        child: mathDataColumnContainer,
       ),
     );
 
