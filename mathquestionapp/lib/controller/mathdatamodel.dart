@@ -204,6 +204,7 @@ class MathDataModel extends Model {
       } else if (expression[i] == '(') {
         _stackExpression.pushChar(expression[i]);
       } else if (expression[i] == ')') {
+        
       } else {
         while (!_stackExpression.isEmptyChar()) {
           int pre1 = precedence(_stackExpression.topChar());
