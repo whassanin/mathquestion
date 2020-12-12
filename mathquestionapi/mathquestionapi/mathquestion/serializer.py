@@ -14,13 +14,13 @@ def applyOp(a, b, op):
     if op == '+': return a + b
     if op == '-': return a - b
     if op == '*': return a * b
-    if op == '/': return a // b
+    if op == '/': return a / b
     
 def calculate(tokens):
     values = []
     ops = []
     i = 0
-    while(i < len (tokens)):
+    while i < len (tokens):
             
         if tokens[i] == ' ':
             i+=1
@@ -46,7 +46,9 @@ def calculate(tokens):
                 val2 = values.pop()
                 val1 = values.pop()
                 op = ops.pop()
-                values.append(applyOp(val1, val2, op))
+                r = applyOp(val1, val2, op)
+                values.append(r)
+                
             ops.pop()
             
         else:

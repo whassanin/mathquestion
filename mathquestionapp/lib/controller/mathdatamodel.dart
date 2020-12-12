@@ -204,7 +204,32 @@ class MathDataModel extends Model {
       } else if (expression[i] == '(') {
         _stackExpression.pushChar(expression[i]);
       } else if (expression[i] == ')') {
-        
+        while(!_stackExpression.isEmptyChar() && _stackExpression.topChar()!='('){
+          double val2,val1;
+          if (!_stackExpression.isEmptyValues()) {
+            val2 = double.parse(_stackExpression.topValues());
+            _stackExpression.popValues();
+          }
+
+          if (!_stackExpression.isEmptyValues()) {
+            val1 = double.parse(_stackExpression.topValues());
+            _stackExpression.popValues();
+          }
+
+          if (val1 != null && val2 != null) {
+            String op = _stackExpression.topChar();
+            _stackExpression.popChar();
+            double v = applyOp(val1, val2, op);
+            _stackExpression.pushValues(v.toString());
+          } else {
+            break;
+          }
+        }
+
+        if(!_stackExpression.isEmptyChar()){
+          _stackExpression.popChar();
+        }
+
       } else {
         while (!_stackExpression.isEmptyChar()) {
           int pre1 = precedence(_stackExpression.topChar());
@@ -264,6 +289,7 @@ class MathDataModel extends Model {
 
     if (isCalculated) {
       _mathData.error = _stackExpression.popValues();
+      print('error:'+_mathData.error);
     } else {
       _mathData.error = 'Invalid Equation';
     }
