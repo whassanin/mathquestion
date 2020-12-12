@@ -22,7 +22,7 @@ class _MathDataRowWidgetState extends State<MathDataRowWidget> {
     Widget resultText =
         (widget.mathData.isCalculated ? resultWidget : progressWidget);
 
-    Widget valueColumn = Container(
+    Widget equationValueColumn = Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,8 +44,8 @@ class _MathDataRowWidgetState extends State<MathDataRowWidget> {
       ),
     );
 
-    Widget titleColumn = Container(
-      width: 85,
+    Widget equationColumn = Container(
+      width: 90,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,8 +73,8 @@ class _MathDataRowWidgetState extends State<MathDataRowWidget> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          titleColumn,
-          Expanded(child: valueColumn),
+          equationColumn,
+          Expanded(child: equationValueColumn),
         ],
       ),
     );
@@ -96,7 +96,6 @@ class _MathDataRowWidgetState extends State<MathDataRowWidget> {
     return GestureDetector(
       child: mathDataCard,
       onTap: () {
-        print(widget.mathData.toJson().toString());
         mathDataModel.editMathData(widget.mathData);
         Navigator.push(
           context,

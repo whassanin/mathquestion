@@ -4,7 +4,7 @@ import 'package:mathquestionapp/main.dart';
 
 import '../main.dart';
 
-enum MathDataColumns { expression, result, response }
+enum MathDataColumns { expression, result, response}
 
 class MathDataFormWidget extends StatefulWidget {
   final bool isEdit;
@@ -19,6 +19,9 @@ class _MathDataFormWidgetState extends State<MathDataFormWidget> {
   TextEditingController expressionTEC = new TextEditingController();
   TextEditingController resultTEC = new TextEditingController();
   TextEditingController responseTEC = new TextEditingController();
+  TextEditingController latitudeTEC = new TextEditingController();
+  TextEditingController longitudeTEC = new TextEditingController();
+
 
   void setData(MathDataColumns mathDataColumns, Object val) {
     if (mathDataColumns == MathDataColumns.expression) {
@@ -205,6 +208,7 @@ class _MathDataFormWidgetState extends State<MathDataFormWidget> {
           true,
         );
       }
+
     }
 
     Widget editButtons = Row(

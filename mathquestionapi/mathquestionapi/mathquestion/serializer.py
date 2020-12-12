@@ -104,7 +104,7 @@ class MathDataSerializer(serializers.ModelSerializer):
         instance.expression = expression
         instance.responseTime = responseTime
         instance.result = result
-        instance.isCalculated = isCalculated
+        instance.isCalculated = isCalculated  
         instance.createdDate = createdDate
         instance.changedDate = changedDate
         instance.save()
