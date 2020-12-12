@@ -70,7 +70,6 @@ def calculate(tokens):
             
     return values[-1]
 
-
 class MathDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = MathData
