@@ -17,7 +17,7 @@ class _MathDataRowWidgetState extends State<MathDataRowWidget> {
       style: TextStyle(backgroundColor: Colors.red, color: Colors.white),
     );
 
-    Widget resultWidget = Text(widget.mathData.result);
+    Widget resultWidget = Text(widget.mathData.result.toString());
 
     Widget resultText =
         (widget.mathData.isCalculated ? resultWidget : progressWidget);
@@ -96,7 +96,6 @@ class _MathDataRowWidgetState extends State<MathDataRowWidget> {
     return GestureDetector(
       child: mathDataCard,
       onTap: () {
-        mathDataModel.stop();
         print(widget.mathData.toJson().toString());
         mathDataModel.editMathData(widget.mathData);
         Navigator.push(

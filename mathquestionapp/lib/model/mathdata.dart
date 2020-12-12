@@ -8,13 +8,16 @@ part 'mathdata.g.dart';
 class MathData{
   int id;
   String expression;
-  String result;
+  double result;
   int responseTime;
   bool isCalculated;
   DateTime createdDate;
-  DateTime executionDate;
+  DateTime changedDate;
 
-  MathData(this.id,this.expression,this.result,this.responseTime,this.isCalculated,this.createdDate,this.executionDate);
+  @JsonKey(ignore: true)
+  String error;
+
+  MathData(this.id,this.expression,this.result,this.responseTime,this.isCalculated,this.createdDate,this.changedDate);
 
   factory MathData.fromJson(Map<String, dynamic> json) => _$MathDataFromJson(json);
 

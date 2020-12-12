@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mathquestionapp/main.dart';
 
+import '../main.dart';
+
 enum MathDataColumns { expression, result, response }
 
 class MathDataFormWidget extends StatefulWidget {
@@ -30,13 +32,15 @@ class _MathDataFormWidgetState extends State<MathDataFormWidget> {
 
   void getData() {
     expressionTEC.text = mathDataModel.getExpression();
-    resultTEC.text = mathDataModel.getResult();
+    resultTEC.text = mathDataModel.getResult().toString();
     responseTEC.text = mathDataModel.getResponseTime().toString();
   }
 
   void saveData() {
     if (_formKey.currentState.validate()) {
       if (widget.isEdit) {
+        mathDataModel.setChangedDate(DateTime.now());
+        mathDataModel.setIsCalculated(false);
         mathDataModel.update();
       } else {
         mathDataModel.createMathData();
@@ -44,7 +48,7 @@ class _MathDataFormWidgetState extends State<MathDataFormWidget> {
         mathDataModel.setResponseTime(int.parse(responseTEC.text));
         mathDataModel.create();
       }
-      mathDataModel.start();
+      //mathDataModel.start();
       Navigator.pop(context);
     }
   }
@@ -82,21 +86,22 @@ class _MathDataFormWidgetState extends State<MathDataFormWidget> {
         ),
       ),
       validator: (v) {
-        if (mathDataColumns == MathDataColumns.expression ||
-            mathDataColumns == MathDataColumns.response) {
+
+        if (columnTEC.text.isEmpty) {
+          return 'Required';
+        }else if(mathDataColumns == MathDataColumns.expression){
+          setData(mathDataColumns, v);
+          if (mathDataModel.validate()==false) {
+            return mathDataModel.getError();
+          }
+        }else if(mathDataColumns == MathDataColumns.response){
           if (columnTEC.text.isEmpty) {
             return 'Required';
-          } else if (mathDataColumns == MathDataColumns.expression) {
-            setData(mathDataColumns, v);
-            if (widget.isEdit == false) {
-              if (mathDataModel.isExist()) {
-                return 'Task is already exist';
-              }
-            }
-          } else {
-            setData(mathDataColumns, v);
           }
+        }else {
+          setData(mathDataColumns, v);
         }
+
         return null;
       },
       onChanged: (v) {
@@ -191,7 +196,7 @@ class _MathDataFormWidgetState extends State<MathDataFormWidget> {
     Widget resultTFF = Container();
 
     if (widget.isEdit) {
-      if (mathDataModel.getResult().isNotEmpty) {
+      if (mathDataModel.getResult().toString().isNotEmpty) {
         resultTFF = textFormField(
           resultTEC,
           'Result',
@@ -212,7 +217,7 @@ class _MathDataFormWidgetState extends State<MathDataFormWidget> {
       editButtons = Row(
         children: [
           button(
-            'Save Task',
+            'Reschedule Task',
             Colors.blue,
             fun: saveData,
           ),

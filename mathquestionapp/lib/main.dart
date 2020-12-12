@@ -1,5 +1,9 @@
+import 'dart:async';
+import 'dart:isolate';
+
 import 'package:flutter/material.dart';
 import 'package:mathquestionapp/controller/mathdatamodel.dart';
+import 'package:mathquestionapp/model/mathdata.dart';
 import 'package:mathquestionapp/view/viewmathdatascreen.dart';
 
 MathDataModel mathDataModel = new MathDataModel();
@@ -10,15 +14,17 @@ void main() {
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) {
+    //mathDataModel.generateData();
+    mathDataModel.start();
 
     return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         // This is the theme of your application.
-        //
         // Try running your application with "flutter run". You'll see the
         // application has a blue toolbar. Then, without quitting the app, try
         // changing the primarySwatch below to Colors.green and then invoke

@@ -10,20 +10,31 @@ class MathDataListWidget extends StatefulWidget {
 
 class _MathDataListWidgetState extends State<MathDataListWidget> {
   Widget getList() {
-
     Widget current = Container();
 
-    if(mathDataModel.isLoading){
-      current = Center(child: Container(child: CircularProgressIndicator(),),);
-    }
-    else {
-      current = ListView.builder(
-        shrinkWrap: true,
-        itemCount: MathDataModel.currentList.length,
-        itemBuilder: (BuildContext context, int index) {
-          return MathDataRowWidget(MathDataModel.currentList[index]);
-        },
+    if (mathDataModel.isLoading) {
+      current = Center(
+        child: Container(
+          child: CircularProgressIndicator(),
+        ),
       );
+    } else {
+      print('content:' + mathDataModel.mathDataList.length.toString());
+      if (mathDataModel.mathDataList.length == 0) {
+        current = Center(
+          child: Container(
+            child: CircularProgressIndicator(),
+          ),
+        );
+      } else {
+        current = ListView.builder(
+          shrinkWrap: true,
+          itemCount: mathDataModel.mathDataList.length,
+          itemBuilder: (BuildContext context, int index) {
+            return MathDataRowWidget(mathDataModel.mathDataList[index]);
+          },
+        );
+      }
     }
 
     return current;

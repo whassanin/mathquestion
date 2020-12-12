@@ -5,11 +5,12 @@ import 'package:mathquestionapp/view/newmathdatascreen.dart';
 import 'package:mathquestionapp/widget/mathdatalistwidget.dart';
 import 'package:scoped_model/scoped_model.dart';
 
+import '../main.dart';
+
 class ViewMathDataScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-
-    mathDataModel.start();
+    mathDataModel.readAll();
 
     return ScopedModel<MathDataModel>(
       model: mathDataModel,
@@ -19,14 +20,12 @@ class ViewMathDataScreen extends StatelessWidget {
           Widget child,
           MathDataModel mathDataModel,
         ) {
-
           AppBar appBar = new AppBar(
             title: Text('Math Question'),
             actions: [
               IconButton(
                 icon: Icon(Icons.add),
                 onPressed: () {
-                  mathDataModel.stop();
                   mathDataModel.createMathData();
                   Navigator.push(
                     context,
