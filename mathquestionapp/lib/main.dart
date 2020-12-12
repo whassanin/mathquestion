@@ -15,57 +15,10 @@ void main() {
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
 
-  Isolate _isolate;
-  ReceivePort _receivePort;
-  bool _running = false;
-
-  void start() async {
-    _running = true;
-    _receivePort = ReceivePort();
-    _isolate = await Isolate.spawn(_checkTask, _receivePort.sendPort);
-    _receivePort.listen(_handleMessage, onDone: () {
-      print('Evaluated');
-    });
-  }
-
-  static void _checkTask(SendPort sendPort) async {
-    Timer.periodic(Duration(seconds: 5), (timer) {
-      print('handle' + MathDataModel.getList().length.toString());
-      mathDataModel.mathDataList.forEach((element) {
-        DateTime currentTime = DateTime.now();
-        DateTime runtAtTime =
-        element.createdDate.add(Duration(seconds: element.responseTime));
-        if (currentTime.compareTo(runtAtTime) > 0) {
-          print(element.toJson().toString());
-          sendPort.send(element.toJson());
-        }
-      });
-    });
-  }
-
-  void _handleMessage(dynamic data) {
-    print('Received');
-    MathData mathData = MathData.fromJson(data);
-    mathDataModel.editMathData(mathData);
-    mathDataModel.setIsCalculated(true);
-    mathDataModel.update();
-  }
-
-  void stop() {
-    if (_isolate != null) {
-      _running = false;
-      _receivePort.close();
-      _isolate.kill(priority: Isolate.immediate);
-      _isolate = null;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-
     //mathDataModel.generateData();
-    mathDataModel.readAll();
-    start();
+    mathDataModel.start();
 
     return MaterialApp(
       title: 'Flutter Demo',

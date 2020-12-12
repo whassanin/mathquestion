@@ -20,7 +20,6 @@ def calculate(tokens):
     values = []
     ops = []
     i = 0
-    print(len(tokens))
     while(i < len (tokens)):
             
         if tokens[i] == ' ':
@@ -80,7 +79,7 @@ class MathDataSerializer(serializers.ModelSerializer):
             'responseTime',
             'isCalculated',
             'createdDate',
-            'executionDate'
+            'changedDate'
         ]
 
     def create(self,validated_data):
@@ -89,7 +88,23 @@ class MathDataSerializer(serializers.ModelSerializer):
         result = calculate(expression)
         isCalculated = False
         createdDate = validated_data.get('createdDate')
-        executionDate = validated_data.get('executionDate')
-        mathData = MathData(expression=expression,result=result,isCalculated=isCalculated,createdDate=createdDate,executionDate=executionDate)
-        mathData = MathData.objects.create(expression=expression,result=result,responseTime=responseTime,isCalculated=isCalculated,createdDate=createdDate,executionDate=executionDate)
+        changedDate = validated_data.get('changedDate')
+        mathData = MathData(expression=expression,result=result,isCalculated=isCalculated,createdDate=createdDate,changedDate=changedDate)
+        mathData = MathData.objects.create(expression=expression,result=result,responseTime=responseTime,isCalculated=isCalculated,createdDate=createdDate,changedDate=changedDate)
         return mathData
+    
+    def update(self,instance,validated_data):
+        expression = validated_data.get('expression')
+        responseTime = validated_data.get('responseTime')
+        result = calculate(expression)
+        isCalculated = validated_data.get('isCalculated')
+        createdDate = validated_data.get('createdDate')
+        changedDate = validated_data.get('changedDate')
+        instance.expression = expression
+        instance.responseTime = responseTime
+        instance.result = result
+        instance.isCalculated = isCalculated
+        instance.createdDate = createdDate
+        instance.changedDate = changedDate
+        instance.save()
+        return instance

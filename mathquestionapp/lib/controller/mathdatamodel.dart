@@ -8,9 +8,6 @@ import 'package:mathquestionapp/main.dart';
 import 'package:mathquestionapp/model/mathdata.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-import '../model/mathdata.dart';
-import '../model/mathdata.dart';
-
 class StackExpression {
   Queue<String> _queueChar = Queue<String>();
   Queue<String> _queueValues = Queue<String>();
@@ -75,8 +72,11 @@ class MathDataModel extends Model {
   StackExpression _stackExpression = StackExpression();
 
   bool _isLoading = false;
-
   bool get isLoading => _isLoading;
+
+  Isolate _isolate;
+  ReceivePort _receivePort;
+  bool _running = false;
 
   MathData _mathData = new MathData(
     0,
@@ -91,10 +91,6 @@ class MathDataModel extends Model {
   MathData get mathData => _mathData;
 
   List<MathData> mathDataList = [];
-
-  static List<MathData> getList(){
-    return mathDataModel.mathDataList;
-  }
 
   void createMathData() {
     _mathData = new MathData(
@@ -152,6 +148,14 @@ class MathDataModel extends Model {
 
   bool getIsCalculated() {
     return _mathData.isCalculated;
+  }
+
+  void setChangedDate(DateTime dateTime){
+    _mathData.changedDate = dateTime;
+  }
+
+  DateTime getChangedDate(){
+    return _mathData.changedDate;
   }
 
   int precedence(String op) {
@@ -291,7 +295,7 @@ class MathDataModel extends Model {
     if (_mathData.id != null) {
       if (_mathData.id > 0) {
         mathDataList.add(_mathData);
-        await Future.delayed(Duration(seconds: 1));
+        notifyListeners();
         return true;
       }
     }
@@ -299,11 +303,19 @@ class MathDataModel extends Model {
   }
 
   Future<bool> update() async {
-    int code = await _api.put(_mathData.toJson(), _mathData.id.toString());
-    if (code == 200) {
-      notifyListeners();
-
-      return true;
+    String body = await _api.put(_mathData.toJson(), _mathData.id.toString());
+    Map<String, dynamic> list = jsonDecode(body);
+    _mathData = MathData.fromJson(list);
+    if(_mathData.id!=null){
+      if(_mathData.id > 0){
+        int index = mathDataList.indexWhere(
+              (element) => element.id == _mathData.id,
+        );
+        print('update:'+_mathData.toJson().toString());
+        mathDataList[index] = _mathData;
+        notifyListeners();
+        return true;
+      }
     }
     return false;
   }
@@ -316,6 +328,54 @@ class MathDataModel extends Model {
       return true;
     }
     return false;
+  }
+
+  void process() {
+    mathDataList.forEach((element) {
+      DateTime currentTime = DateTime.now();
+      DateTime runtAtTime = element.changedDate.add(
+        Duration(
+          hours: -2,
+          seconds: element.responseTime,
+        ),
+      );
+
+      int v = runtAtTime.difference(currentTime).inSeconds;
+      if (v < 0 && element.isCalculated == false) {
+        editMathData(element);
+        setIsCalculated(true);
+        update();
+      }
+    });
+  }
+
+  void start() async {
+    _running = true;
+    _receivePort = ReceivePort();
+    _isolate = await Isolate.spawn(_checkTask, _receivePort.sendPort);
+    _receivePort.listen(_handleMessage, onDone: () {
+      print('Evaluated');
+    });
+  }
+
+  static void _checkTask(SendPort sendPort) async {
+    Timer.periodic(Duration(seconds: 10), (timer) {
+      sendPort.send('Sending');
+    });
+  }
+
+  void _handleMessage(dynamic data) {
+    print('Received');
+    process();
+  }
+
+  void stop() {
+    if (_isolate != null) {
+      _running = false;
+      _receivePort.close();
+      _isolate.kill(priority: Isolate.immediate);
+      _isolate = null;
+    }
   }
 
   void generateData() async {

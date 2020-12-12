@@ -40,7 +40,7 @@ class Api {
     return data.body;
   }
 
-  Future<int> put(Map<String, dynamic> jsonBody, String columnId) async {
+  Future<String> put(Map<String, dynamic> jsonBody, String columnId) async {
     final data = await http.put(
       _url + '/' + columnId,
       headers: {
@@ -48,7 +48,7 @@ class Api {
       },
       body: jsonEncode(jsonBody),
     );
-    return data.statusCode;
+    return data.body;
   }
 
   Future<int> delete(String valueId) async {

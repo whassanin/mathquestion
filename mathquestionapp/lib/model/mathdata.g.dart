@@ -16,9 +16,9 @@ MathData _$MathDataFromJson(Map<String, dynamic> json) {
     json['createdDate'] == null
         ? null
         : DateTime.parse(json['createdDate'] as String),
-    json['executionDate'] == null
+    json['changedDate'] == null
         ? null
-        : DateTime.parse(json['executionDate'] as String),
+        : DateTime.parse(json['changedDate'] as String),
   );
 }
 
@@ -29,5 +29,5 @@ Map<String, dynamic> _$MathDataToJson(MathData instance) => <String, dynamic>{
       'responseTime': instance.responseTime,
       'isCalculated': instance.isCalculated,
       'createdDate': instance.createdDate?.toIso8601String(),
-      'executionDate': instance.executionDate?.toIso8601String(),
+      'changedDate': instance.changedDate?.toIso8601String(),
     };

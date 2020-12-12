@@ -39,6 +39,8 @@ class _MathDataFormWidgetState extends State<MathDataFormWidget> {
   void saveData() {
     if (_formKey.currentState.validate()) {
       if (widget.isEdit) {
+        mathDataModel.setChangedDate(DateTime.now());
+        mathDataModel.setIsCalculated(false);
         mathDataModel.update();
       } else {
         mathDataModel.createMathData();
@@ -215,7 +217,7 @@ class _MathDataFormWidgetState extends State<MathDataFormWidget> {
       editButtons = Row(
         children: [
           button(
-            'Save Task',
+            'Reschedule Task',
             Colors.blue,
             fun: saveData,
           ),

@@ -8,7 +8,7 @@ class MathData(models.Model):
     responseTime = models.IntegerField()
     isCalculated = models.BooleanField()
     createdDate = models.DateTimeField()
-    executionDate = models.DateTimeField()
+    changedDate = models.DateTimeField()
 
     def __str__(self):
         return str(self.id)

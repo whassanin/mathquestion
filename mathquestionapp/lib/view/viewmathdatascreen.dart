@@ -10,6 +10,7 @@ import '../main.dart';
 class ViewMathDataScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    mathDataModel.readAll();
 
     return ScopedModel<MathDataModel>(
       model: mathDataModel,
@@ -19,7 +20,6 @@ class ViewMathDataScreen extends StatelessWidget {
           Widget child,
           MathDataModel mathDataModel,
         ) {
-
           AppBar appBar = new AppBar(
             title: Text('Math Question'),
             actions: [
