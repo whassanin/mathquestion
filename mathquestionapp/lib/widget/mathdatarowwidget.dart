@@ -96,7 +96,6 @@ class _MathDataRowWidgetState extends State<MathDataRowWidget> {
     return GestureDetector(
       child: mathDataCard,
       onTap: () {
-        print(widget.mathData.toJson().toString());
         mathDataModel.editMathData(widget.mathData);
         Navigator.push(
           context,

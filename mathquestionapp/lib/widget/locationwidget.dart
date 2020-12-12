@@ -9,11 +9,12 @@ class LocationWidget extends StatefulWidget {
 class _LocationWidgetState extends State<LocationWidget> {
   @override
   Widget build(BuildContext context) {
-
-    String location = mathDataModel.getLatitude().toString() + ' , '+mathDataModel.getLongitude().toString();
+    String location = mathDataModel.getLatitude().toString() +
+        ' , ' +
+        mathDataModel.getLongitude().toString();
 
     Widget locationText = Expanded(
-      child: Text('Location: '+location),
+      child: Text('Location: ' + location),
     );
 
     Widget locationRow = Row(
@@ -42,7 +43,7 @@ class _LocationWidgetState extends State<LocationWidget> {
     );
 
     return Padding(
-      padding: const EdgeInsets.only(left: 10.0,right: 10.0,top: 10.0),
+      padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
       child: locationCard,
     );
   }
